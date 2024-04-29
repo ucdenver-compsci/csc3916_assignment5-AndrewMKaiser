@@ -5,13 +5,35 @@ var mongoose = require('mongoose');
 var authJwtController = require('../auth_jwt');
 
 router.get('/', authJwtController.isAuthenticated, function (req, res) {
-    Movie.find({}, function(err, movies) {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(movies);
-        }
-    });
+    if (req.query.reviews == 'true') {
+        const aggregate = [
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "_id",
+                    foreignField: "movieId",
+                    as: "reviews"
+                }
+            },
+            {
+                $addFields: {
+                    averageRating: { $avg: "$reviews.rating" }
+                }
+            },
+            {
+                $sort: { averageRating: -1 }
+            }
+        ];
+    }
+    else {
+        Movie.find({}, function(err, movies) {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.json(movies);
+            }
+        });
+    }
 });
 
 
@@ -44,9 +66,6 @@ router.get('/:movieparameter', authJwtController.isAuthenticated, function (req,
                 $addFields: {
                     averageRating: { $avg: "$reviews.rating" }
                 }
-            },
-            {
-                $sort: { averageRating: -1 }
             },
             {
                 $limit: 1
