@@ -13,11 +13,12 @@ const MovieSchema = new mongoose.Schema({
         'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Thriller', 'Western', 'Science Fiction'
       ],
     },
+    imageUrl: { type: String, required: true },
     actors: [{
       actorName: String,
       characterName: String,
-    }],
-    imageUrl: String,
+    }]
+    
 });
 
 // Movie model
@@ -28,7 +29,7 @@ MovieSchema.pre('save', function(next) {
   const movie = this;
 
   // Check if all required fields are present
-  if (!movie.title || !movie.releaseDate || !movie.genre || !movie.actors) {
+  if (!movie.title || !movie.releaseDate || !movie.genre || !movie.actors || !movie.imageUrl) {
     return next(new Error('All fields are required'));
   }
 
