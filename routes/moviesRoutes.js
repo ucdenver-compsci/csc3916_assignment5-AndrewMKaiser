@@ -6,7 +6,7 @@ var authJwtController = require('../auth_jwt');
 
 router.get('/', authJwtController.isAuthenticated, function (req, res) {
     if (req.query.reviews ==='true') {
-        Movie.aggregate = ([
+        Movie.aggregate([
             {
                 $lookup: {
                     from: "reviews",
