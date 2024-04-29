@@ -29,7 +29,7 @@ function trackDimension(category, action, label, value, dimension, metric) {
     return rp(options);
 }
 
-router.get('/', function (req, res) {
+router.get('/', authJwtController.isAuthenticated, function (req, res) {
     Review.find({}, function(err, reviews) {
         if (err) {
             res.status(500).send(err);
