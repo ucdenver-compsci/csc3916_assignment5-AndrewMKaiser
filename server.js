@@ -16,7 +16,6 @@ var moviesRouter = require('./routes/moviesRoutes');
 var usersRouter = require('./routes/usersRoutes');
 var User = require('./models/Users');
 var reviewsRouter = require('./routes/reviewsRoutes');
-require('dotenv').config();
 
 
 
