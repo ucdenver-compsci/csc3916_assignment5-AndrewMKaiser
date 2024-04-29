@@ -5,8 +5,8 @@ var mongoose = require('mongoose');
 var authJwtController = require('../auth_jwt');
 
 router.get('/', authJwtController.isAuthenticated, function (req, res) {
-    if (req.query.reviews == 'true') {
-        const aggregate = [
+    if (req.query.reviews ==='true') {
+        Movie.aggregate = ([
             {
                 $lookup: {
                     from: "reviews",
@@ -23,9 +23,14 @@ router.get('/', authJwtController.isAuthenticated, function (req, res) {
             {
                 $sort: { averageRating: -1 }
             }
-        ];
-    }
-    else {
+        ]).exec((err, movies) => {
+            if (err) {
+                res.status(500).json({error: 'Internal server error.'});
+            } else {
+                res.json(movies);
+            }
+          });
+    } else {
         Movie.find({}, function(err, movies) {
             if (err) {
                 res.status(500).send(err);
@@ -35,7 +40,6 @@ router.get('/', authJwtController.isAuthenticated, function (req, res) {
         });
     }
 });
-
 
 router.get('/:movieparameter', authJwtController.isAuthenticated, function (req, res) {
     const id = mongoose.Types.ObjectId(req.params.movieparameter);
