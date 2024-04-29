@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 var Movie = require('../models/Movies');
 var mongoose = require('mongoose');
+var authJwtController = require('../auth_jwt');
 
-router.get('/', function (req, res) {
+router.get('/', authJwtController.isAuthenticated, function (req, res) {
     Movie.find({}, function(err, movies) {
         if (err) {
             res.status(500).send(err);
@@ -14,7 +15,7 @@ router.get('/', function (req, res) {
 });
 
 
-router.get('/:movieparameter', function (req, res) {
+router.get('/:movieparameter', authJwtController.isAuthenticated, function (req, res) {
     const id = mongoose.Types.ObjectId(req.params.movieparameter);
     if (!req.query.reviews) {
         Movie.findOne({ _id: id }, function(err, movie) {
@@ -38,6 +39,17 @@ router.get('/:movieparameter', function (req, res) {
                     foreignField: "movieId",
                     as: "reviews"
                 }
+            },
+            {
+                $addFields: {
+                    averageRating: { $avg: "$reviews.rating" }
+                }
+            },
+            {
+                $sort: { averageRating: -1 }
+            },
+            {
+                $limit: 1
             }
         ]).exec(function(err, result) {
             if (err) {
@@ -52,7 +64,7 @@ router.get('/:movieparameter', function (req, res) {
 });
             
 
-router.post('/', function(req, res) {
+router.post('/', authJwtController.isAuthenticated, function(req, res) {
     var movie = new Movie();
     movie.title = req.body.title;
     movie.releaseDate = req.body.releaseDate;
@@ -68,7 +80,7 @@ router.post('/', function(req, res) {
     });
 });
 
-router.put('/:movieparameter', function(req, res) {
+router.put('/:movieparameter', authJwtController.isAuthenticated, function(req, res) {
     Movie.findOneAndUpdate({ title: req.params.movieparameter }, req.body, function(err, movie) {
         if (err) {
             res.status(500).send(err);
@@ -80,7 +92,7 @@ router.put('/:movieparameter', function(req, res) {
     });
 });
 
-router.delete('/:movieparameter', function(req, res) {
+router.delete('/:movieparameter', authJwtController.isAuthenticated, function(req, res) {
     Movie.findOneAndDelete({ title: req.params.movieparameter }, function(err, movie) {
         if (err) {
             res.send(err);
@@ -92,7 +104,7 @@ router.delete('/:movieparameter', function(req, res) {
     });
 });    
 
-router.all('/', function(req, res) {
+router.all('/', authJwtController.isAuthenticated, function(req, res) {
     res.status(405).send({success: false, msg: 'Method not allowed.'});
 });
 
