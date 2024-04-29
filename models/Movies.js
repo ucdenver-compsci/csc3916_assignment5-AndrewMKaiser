@@ -13,7 +13,7 @@ const MovieSchema = new mongoose.Schema({
         'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Thriller', 'Western', 'Science Fiction'
       ],
     },
-    imageUrl: { type: String, required: true },
+    imageUrl: String,
     actors: [{
       actorName: String,
       characterName: String,
@@ -23,18 +23,6 @@ const MovieSchema = new mongoose.Schema({
 
 // Movie model
 const Movie = mongoose.model('Movie', MovieSchema);
-
-// Function to check for the presence of all fields before saving the movie
-MovieSchema.pre('save', function(next) {
-  const movie = this;
-
-  // Check if all required fields are present
-  if (!movie.title || !movie.releaseDate || !movie.genre || !movie.actors || !movie.imageUrl) {
-    return next(new Error('All fields are required'));
-  }
-
-  next();
-});
 
 // return the model
 module.exports = mongoose.model('Movie', MovieSchema);
